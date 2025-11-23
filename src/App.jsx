@@ -13,6 +13,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [summarizingId, setSummarizingId] = useState(null);
   const [summary, setSummary] = useState("");
+  const [summaryId, setSummaryId] = useState(null);
   const [error, setError] = useState("");
 
   // Load highlights on popup open
@@ -36,6 +37,11 @@ function App() {
   const handleDelete = (id) => {
     const updated = highlights.filter((h) => h.id !== id);
     setHighlights(updated);
+
+    if (id === summaryId) {
+      setSummary("");
+      setSummaryId(null);
+    }
     
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ highlights: updated });
@@ -46,6 +52,7 @@ function App() {
   const handleSummarize = async (id, text) => {
     setError("");
     setSummary("");
+    setSummaryId(null);
     setSummarizingId(id);
     
     const apiKey = import.meta.env.VITE_CEREBRAS_API_KEY;
@@ -89,6 +96,7 @@ function App() {
 
       const resultText = data.choices?.[0]?.message?.content?.trim() || "";
       setSummary(resultText);
+      setSummaryId(id);
     } catch (err) {
       console.error(err);
       setError(err.message);

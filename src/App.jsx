@@ -108,82 +108,87 @@ function App() {
   };
 
   return (
-    <div className="w-[380px] h-[480px] bg-slate-950 text-slate-100 flex flex-col">
-      <header className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+    <div className="w-[380px] h-[480px] bg-black text-white flex flex-col font-sans">
+      <header className="px-5 py-4 border-b border-zinc-900 flex items-center justify-between bg-black">
         <div>
-          <h1 className="text-sm font-semibold">Highlight Saver</h1>
-          <p className="text-[11px] text-slate-400">
-            Select text on any page, then click “Save highlight?”
+          <h1 className="text-sm font-semibold tracking-tight text-white">
+            Highlight Saver
+          </h1>
+          <p className="text-[11px] text-zinc-500 mt-0.5">
+            Your personal knowledge base
           </p>
         </div>
-        <span className="text-[10px] text-slate-500">
+        <span className="text-[10px] font-medium text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800">
           {highlights.length} saved
         </span>
       </header>
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col bg-black">
         {/* Summarize section */}
-        <div className="px-4 py-2 border-b border-slate-800 flex items-center gap-2">
+        <div className="px-5 py-3 border-b border-zinc-900 flex items-center gap-3">
           <button
             onClick={handleSummarize}
             disabled={summarizing || highlights.length === 0}
-            className="text-xs px-3 py-1 rounded-full bg-indigo-600 disabled:bg-slate-700 disabled:text-slate-400 hover:bg-indigo-500 transition"
+            className="text-[11px] font-medium px-4 py-1.5 rounded-full bg-white text-black hover:bg-green-500 hover:text-black disabled:bg-zinc-800 disabled:text-zinc-500 transition-all duration-200 ease-out"
           >
             {summarizing ? "Summarizing..." : "Summarize"}
           </button>
-          <span className="text-[11px] text-slate-400">
-            AI summary of your saved highlights
+          <span className="text-[10px] text-zinc-500">
+            Generate AI summary
           </span>
         </div>
 
         {/* Summary output */}
         {summary && (
-          <div className="px-4 py-2 text-xs text-slate-100 border-b border-slate-800 max-h-28 overflow-auto whitespace-pre-wrap">
+          <div className="px-5 py-4 text-xs text-zinc-300 border-b border-zinc-900 max-h-36 overflow-auto whitespace-pre-wrap bg-zinc-900/30 leading-relaxed">
             {summary}
           </div>
         )}
 
         {error && (
-          <div className="px-4 py-2 text-xs text-red-400 border-b border-slate-800">
+          <div className="px-5 py-3 text-xs text-red-400 border-b border-zinc-900 bg-red-500/5">
             {error}
           </div>
         )}
 
         {/* Highlights list */}
-        <div className="flex-1 overflow-auto px-3 py-2 space-y-2">
+        <div className="flex-1 overflow-auto px-4 py-3 space-y-2.5 custom-scrollbar">
           {loading ? (
-            <p className="text-xs text-slate-400">Loading highlights...</p>
+            <p className="text-xs text-zinc-500 px-1">Loading highlights...</p>
           ) : highlights.length === 0 ? (
-            <p className="text-xs text-slate-400">
-              No highlights yet. Select text on any webpage to see the “Save highlight?” bubble.
-            </p>
+            <div className="flex flex-col items-center justify-center h-40 text-center px-6">
+              <p className="text-sm text-zinc-400 font-medium">No highlights yet</p>
+              <p className="text-[11px] text-zinc-600 mt-1">
+                Select text on any page and click the popup to save it here.
+              </p>
+            </div>
           ) : (
             highlights.map((h) => (
               <div
                 key={h.id}
-                className="border border-slate-800 rounded-lg p-2 text-xs bg-slate-900/60 flex flex-col gap-1"
+                className="group relative border border-zinc-800 rounded-xl p-3.5 text-xs bg-zinc-950 hover:border-green-500/50 transition-colors duration-200"
               >
-                <p className="text-slate-100 whitespace-pre-wrap">
-                  “{h.text}”
+                <p className="text-zinc-200 whitespace-pre-wrap leading-relaxed mb-3">
+                  {h.text}
                 </p>
-                <div className="flex justify-between items-center gap-2">
-                  <div className="flex flex-col">
+                <div className="flex justify-between items-end gap-3">
+                  <div className="flex flex-col min-w-0 gap-0.5">
                     <a
                       href={h.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[10px] text-indigo-400 truncate max-w-[180px]"
+                      className="text-[10px] font-medium text-zinc-500 hover:text-green-400 truncate max-w-[220px] transition-colors"
                       title={h.title || h.url}
                     >
                       {h.title || h.url}
                     </a>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[9px] text-zinc-600">
                       {formatDate(h.createdAt)}
                     </span>
                   </div>
                   <button
                     onClick={() => handleDelete(h.id)}
-                    className="text-[10px] px-2 py-1 rounded-full border border-red-500 text-red-400 hover:bg-red-500/10"
+                    className="text-[10px] px-3 py-1 rounded-full bg-red-600 text-white border border-red-600 hover:bg-black hover:text-red-500 transition-colors duration-200 font-medium shadow-sm"
                   >
                     Delete
                   </button>
@@ -194,8 +199,9 @@ function App() {
         </div>
       </main>
 
-      <footer className="px-4 py-2 border-t border-slate-800 text-[10px] text-slate-500 text-right">
-        Built with React + Tailwind
+      <footer className="px-5 py-3 border-t border-zinc-900 bg-black text-[10px] text-zinc-600 flex justify-between items-center">
+        <span>v1.0</span>
+        <span className="opacity-50">Powered by Cerebras</span>
       </footer>
     </div>
   );

@@ -18,7 +18,7 @@ function createPopup(x, y, selectedText) {
     highlightPopup.style.left = x + "px";
     highlightPopup.style.transform = "translateX(-50%)"; // Center the popup
     highlightPopup.style.zIndex = 999999;
-    highlightPopup.style.background = "#111827"; // dark gray
+    highlightPopup.style.background = "#111827"; 
     highlightPopup.style.color = "white";
     highlightPopup.style.padding = "6px 10px";
     highlightPopup.style.borderRadius = "9999px";

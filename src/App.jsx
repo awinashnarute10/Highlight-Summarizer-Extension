@@ -11,7 +11,7 @@ function formatDate(ts) {
 function App() {
   const [highlights, setHighlights] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [summarizing, setSummarizing] = useState(false);
+  const [summarizingId, setSummarizingId] = useState(null);
   const [summary, setSummary] = useState("");
   const [error, setError] = useState("");
 
@@ -42,29 +42,19 @@ function App() {
     }
   };
 
-  // OPTIONAL: Summarize using OpenAI
-  const handleSummarize = async () => {
+  // Summarize specific highlight using Cerebras
+  const handleSummarize = async (id, text) => {
     setError("");
     setSummary("");
-    setSummarizing(true);
+    setSummarizingId(id);
     
     const apiKey = import.meta.env.VITE_CEREBRAS_API_KEY;
     console.log("Debug - API Key loaded:", apiKey ? "Yes (starts with " + apiKey.substring(0, 3) + ")" : "No");
 
     try {
-      if (highlights.length === 0) {
-        setError("No highlights to summarize.");
-        setSummarizing(false);
-        return;
-      }
-
-      const combinedText = highlights
-        .map((h, idx) => `${idx + 1}. ${h.text}`)
-        .join("\n");
-        
       if (!apiKey) {
         setError("No Cerebras API key set. Add VITE_CEREBRAS_API_KEY in .env.");
-        setSummarizing(false);
+        setSummarizingId(null);
         return;
       }
 
@@ -83,7 +73,7 @@ function App() {
             },
             {
               role: "user",
-              content: `Summarize these highlights concisely:\n\n${combinedText}`,
+              content: `Summarize this highlight concisely:\n\n${text}`,
             },
           ],
           temperature: 0.2,
@@ -103,7 +93,7 @@ function App() {
       console.error(err);
       setError(err.message);
     } finally {
-      setSummarizing(false);
+      setSummarizingId(null);
     }
   };
 
@@ -124,23 +114,10 @@ function App() {
       </header>
 
       <main className="flex-1 flex flex-col bg-black">
-        {/* Summarize section */}
-        <div className="px-5 py-3 border-b border-zinc-900 flex items-center gap-3">
-          <button
-            onClick={handleSummarize}
-            disabled={summarizing || highlights.length === 0}
-            className="text-[11px] font-medium px-4 py-1.5 rounded-full bg-white text-black hover:bg-green-500 hover:text-black disabled:bg-zinc-800 disabled:text-zinc-500 transition-all duration-200 ease-out"
-          >
-            {summarizing ? "Summarizing..." : "Summarize"}
-          </button>
-          <span className="text-[10px] text-zinc-500">
-            Generate AI summary
-          </span>
-        </div>
-
         {/* Summary output */}
         {summary && (
           <div className="px-5 py-4 text-xs text-zinc-300 border-b border-zinc-900 max-h-36 overflow-auto whitespace-pre-wrap bg-zinc-900/30 leading-relaxed">
+            <span className="text-green-500 font-medium block mb-1">AI Summary:</span>
             {summary}
           </div>
         )}
@@ -186,12 +163,21 @@ function App() {
                       {formatDate(h.createdAt)}
                     </span>
                   </div>
-                  <button
-                    onClick={() => handleDelete(h.id)}
-                    className="text-[10px] px-3 py-1 rounded-full bg-red-600 text-white border border-red-600 hover:bg-black hover:text-red-500 transition-colors duration-200 font-medium shadow-sm"
-                  >
-                    Delete
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                        onClick={() => handleSummarize(h.id, h.text)}
+                        disabled={summarizingId === h.id}
+                        className="text-[10px] px-3 py-1 rounded-full bg-white text-black border border-white hover:bg-green-500 hover:border-green-500 hover:text-black transition-colors duration-200 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {summarizingId === h.id ? "..." : "Summarize"}
+                    </button>
+                    <button
+                        onClick={() => handleDelete(h.id)}
+                        className="text-[10px] px-3 py-1 rounded-full bg-red-600 text-white border border-red-600 hover:bg-black hover:text-red-500 transition-colors duration-200 font-medium shadow-sm"
+                    >
+                        Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))

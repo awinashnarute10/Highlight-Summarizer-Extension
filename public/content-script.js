@@ -1,3 +1,5 @@
+console.log("Highlight Extension: Content script loaded!");
+
 // Simple state to avoid multiple popups
 let highlightPopup = null;
 
@@ -18,7 +20,7 @@ function createPopup(x, y, selectedText) {
     highlightPopup.style.left = x + "px";
     highlightPopup.style.transform = "translateX(-50%)"; // Center the popup
     highlightPopup.style.zIndex = 999999;
-    highlightPopup.style.background = "#111827"; 
+    highlightPopup.style.background = "#111827"; // dark gray
     highlightPopup.style.color = "white";
     highlightPopup.style.padding = "6px 10px";
     highlightPopup.style.borderRadius = "9999px";
@@ -33,6 +35,7 @@ function createPopup(x, y, selectedText) {
 
     highlightPopup.addEventListener("click", async (e) => {
         e.stopPropagation();
+        console.log("Highlight Extension: Save button clicked");
 
         const url = window.location.href;
         const title = document.title;
@@ -46,17 +49,34 @@ function createPopup(x, y, selectedText) {
             createdAt: timestamp
         };
 
-        chrome.storage.local.get(["highlights"], (result) => {
-            const current = result.highlights || [];
-            const updated = [newHighlight, ...current];
-            chrome.storage.local.set({ highlights: updated }, () => {
-                // Simple feedback
-                if (highlightPopup) {
-                    highlightPopup.innerText = "Saved!";
-                    setTimeout(removePopup, 800);
+        try {
+            chrome.storage.local.get(["highlights"], (result) => {
+                if (chrome.runtime.lastError) {
+                    console.error("Storage Error:", chrome.runtime.lastError);
+                    alert("Error saving: Please refresh this page and try again.");
+                    return;
                 }
+
+                const current = result.highlights || [];
+                const updated = [newHighlight, ...current];
+
+                chrome.storage.local.set({ highlights: updated }, () => {
+                    if (chrome.runtime.lastError) {
+                        console.error("Storage Set Error:", chrome.runtime.lastError);
+                        return;
+                    }
+                    // Simple feedback
+                    if (highlightPopup) {
+                        highlightPopup.innerText = "Saved!";
+                        setTimeout(removePopup, 800);
+                    }
+                });
             });
-        });
+        } catch (err) {
+            console.error("Extension Context Error:", err);
+            alert("Extension updated. Please refresh the page to continue.");
+            removePopup();
+        }
     });
 
     document.body.appendChild(highlightPopup);
@@ -74,6 +94,8 @@ document.addEventListener("mouseup", (e) => {
         removePopup();
         return;
     }
+
+    console.log("Highlight Extension: Selected text found:", text);
 
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();

@@ -47,6 +47,9 @@ function App() {
     setError("");
     setSummary("");
     setSummarizing(true);
+    
+    const apiKey = import.meta.env.VITE_CEREBRAS_API_KEY;
+    console.log("Debug - API Key loaded:", apiKey ? "Yes (starts with " + apiKey.substring(0, 3) + ")" : "No");
 
     try {
       if (highlights.length === 0) {
@@ -59,21 +62,20 @@ function App() {
         .map((h, idx) => `${idx + 1}. ${h.text}`)
         .join("\n");
         
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
       if (!apiKey) {
-        setError("No OpenAI API key set. Add VITE_OPENAI_API_KEY in .env.");
+        setError("No Cerebras API key set. Add VITE_CEREBRAS_API_KEY in .env.");
         setSummarizing(false);
         return;
       }
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch("https://api.cerebras.ai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: "llama3.1-8b",
           messages: [
             {
               role: "system",
@@ -91,8 +93,8 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error(data);
-        throw new Error(data.error?.message || "Error from OpenAI API");
+        console.error("Cerebras API Error:", response.status, data);
+        throw new Error(data.error?.message || `Error ${response.status}: ${JSON.stringify(data)}`);
       }
 
       const resultText = data.choices?.[0]?.message?.content?.trim() || "";

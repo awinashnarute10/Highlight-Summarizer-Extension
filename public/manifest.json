@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Highlight Summarizer Extension",
+  "version": "1.0",
+  "description": "Highlight text on any page and save it locally. View & manage highlights from the extension popup.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Highlights"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

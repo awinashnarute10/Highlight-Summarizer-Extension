@@ -109,8 +109,8 @@ function App() {
 
   return (
     <div className="w-[380px] h-[480px] bg-black text-white flex flex-col font-sans">
-      <header className="px-5 py-4 border-b border-zinc-900 flex items-center justify-between bg-black">
-        <div>
+      <header className="relative px-5 py-4 border-b border-zinc-900 flex items-center justify-center bg-black">
+        <div className="text-center">
           <h1 className="text-sm font-semibold tracking-tight text-white">
             Highlight Saver
           </h1>
@@ -118,7 +118,7 @@ function App() {
             Your personal knowledge base
           </p>
         </div>
-        <span className="text-[10px] font-medium text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800">
+        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-zinc-400 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800">
           {highlights.length} saved
         </span>
       </header>
